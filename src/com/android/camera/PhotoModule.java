@@ -26,6 +26,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera.CameraInfo;
@@ -59,6 +60,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.camera.CameraManager.CameraProxy;
@@ -70,6 +72,7 @@ import com.android.camera.ui.PreviewSurfaceView;
 import com.android.camera.ui.RenderOverlay;
 import com.android.camera.ui.Rotatable;
 import com.android.camera.ui.RotateTextToast;
+import com.android.camera.ui.RotateLayout;
 import com.android.camera.ui.TwoStateImageView;
 import com.android.camera.ui.ZoomRenderer;
 import com.android.gallery3d.app.CropImage;
@@ -115,6 +118,7 @@ public class PhotoModule
     private static final int START_PREVIEW_DONE = 10;
     private static final int OPEN_CAMERA_FAIL = 11;
     private static final int CAMERA_DISABLED = 12;
+    private static final int CAMERA_TIMER = 14;
 
     // The subset of parameters we need to update in setCameraParameters().
     private static final int UPDATE_PARAM_INITIALIZE = 1;
@@ -160,6 +164,7 @@ public class PhotoModule
     private boolean mAeLockSupported;
     private boolean mAwbLockSupported;
     private boolean mContinousFocusSupported;
+    private int mCaptureMode;
 
     // The degrees of the device rotated clockwise from its natural orientation.
     private int mOrientation = OrientationEventListener.ORIENTATION_UNKNOWN;
@@ -295,6 +300,11 @@ public class PhotoModule
 
     private final Handler mHandler = new MainHandler();
     private PreferenceGroup mPreferenceGroup;
+
+     // Camera timer
+    private boolean mTimerMode = false;
+    private TextView mRecordingTimeView;
+    private RotateLayout mRecordingTimeRect;
 
     // Burst mode
     private int mBurstShotsDone = 0;
@@ -442,6 +452,11 @@ public class PhotoModule
                     Util.showErrorAndFinish(mActivity,
                             R.string.camera_disabled);
                     break;
+               }
+
+                case CAMERA_TIMER: {
+                    updateTimer(msg.arg1);
+                    break;
                 }
             }
         }
@@ -473,6 +488,10 @@ public class PhotoModule
         } else {
             mActivity.createCameraScreenNail(!mIsImageCaptureIntent);
         }
+
+        mRecordingTimeView = (TextView) mRootView.findViewById(R.id.recording_time);
+        mRecordingTimeRect = (RotateLayout) mRootView.findViewById(R.id.recording_time_rect);
+        //mRotateDialog = new RotateDialogController(this, R.layout.rotate_dialog);
 
         mPreferences.setLocalId(mActivity, mCameraId);
         CameraSettings.upgradeLocalPreferences(mPreferences.getLocal());
@@ -1498,6 +1517,7 @@ public class PhotoModule
             mHandler.removeMessages(SHOW_TAP_TO_FOCUS_TOAST);
             showTapToFocusToast();
         }
+        mRecordingTimeRect.setOrientation(mOrientation, false);
     }
 
     @Override
@@ -1616,7 +1636,7 @@ public class PhotoModule
 
     @Override
     public void onShutterButtonFocus(boolean pressed) {
-        if (mPaused || collapseCameraControls()
+        if (mTimerMode && pressed || mPaused || collapseCameraControls()
                 || (mCameraState == SNAPSHOT_IN_PROGRESS)
                 || (mCameraState == PREVIEW_STOPPED)) return;
 
@@ -1634,10 +1654,43 @@ public class PhotoModule
         }
     }
 
+    private void updateTimer(int timerSeconds) {
+        mRecordingTimeView.setText(String.format("%d:%02d", timerSeconds / 60, timerSeconds % 60));
+        timerSeconds--;
+        if (timerSeconds < 0) {
+            capture();
+            onShutterButtonClick();
+        } else {
+            if (timerSeconds < 2) {
+                mFocusManager.onShutterDown();
+                mFocusManager.onShutterUp();
+            }
+            Message timerMsg = Message.obtain();
+            timerMsg.arg1 = timerSeconds;
+            timerMsg.what = CAMERA_TIMER;
+            mHandler.sendMessageDelayed(timerMsg, 1000);
+        }
+    }
+
     @Override
     public void onShutterButtonClick() {
         int nbBurstShots = Integer.valueOf(mPreferences.getString(CameraSettings.KEY_BURST_MODE, "1"));
 
+        if (!mTimerMode) {
+            if (mCaptureMode != 0) {
+                mTimerMode = true;
+                mShutterButton.setImageResource(R.drawable.btn_shutter_video_recording);
+                mRecordingTimeView.setVisibility(View.VISIBLE);
+                updateTimer(mCaptureMode);
+                return;
+            }
+        } else if (mTimerMode) {
+            mShutterButton.setImageResource(R.drawable.btn_new_shutter);
+                    mTimerMode = false;
+                    mHandler.removeMessages(CAMERA_TIMER);
+                    mRecordingTimeView.setVisibility(View.GONE);
+                    return;
+        }
         if (Util.getDoSoftwareHDRShot() && !mHDRShotInProgress && !mHDRRendering) {
             Log.d(TAG, "Starting HDR shot - set min exposure");
             mParameters.setExposureCompensation(mParameters.getMinExposureCompensation());
@@ -2550,6 +2603,10 @@ public class PhotoModule
             mFocusManager.setFocusTime(Integer.valueOf(
                     mPreferences.getString(CameraSettings.KEY_FOCUS_TIME,
                     mActivity.getString(R.string.pref_camera_focustime_default))));
+            // Set capture mode.
+           String defaultTime = mActivity.getString(R.string.pref_camera_timer_default);
+           String delayTime = mPreferences.getString(CameraSettings.KEY_TIMER_MODE, defaultTime);
+           mCaptureMode = Integer.valueOf(delayTime);
         } else {
             mFocusManager.overrideFocusMode(mParameters.getFocusMode());
         }

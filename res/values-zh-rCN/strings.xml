@@ -247,6 +247,16 @@
     <string name="pref_camera_coloreffect_entry_bluetint">偏蓝</string>
     <string name="pref_camera_coloreffect_entry_greentint">偏绿</string>
 
+    <!-- Settings screen, Timer mode title -->
+    <string name="pref_camera_timer_title">计时模式</string>
+
+    <!-- Settings screen, Timer mode entries -->
+    <string name="pref_camera_timer_entry_0">关闭</string>
+    <string name="pref_camera_timer_entry_3">3秒</string>
+    <string name="pref_camera_timer_entry_5">5秒</string>
+    <string name="pref_camera_timer_entry_10">10秒</string>
+    <string name="pref_camera_timer_entry_20">20秒</string>
+
     <!-- Settings screen, Burst mode title -->
     <string name="pref_camera_burst_title">连拍模式</string>
 
