@@ -66,12 +66,12 @@ public class CameraSettings {
     public static final String KEY_VIDEO_FIRST_USE_HINT_SHOWN = "pref_video_first_use_hint_shown_key";
     public static final String KEY_POWER_SHUTTER = "pref_power_shutter";
     public static final String KEY_ISO_MODE = "pref_camera_iso_key";
-	public static final String KEY_STORAGE = "pref_camera_storage_key";
     public static final String KEY_JPEG = "pref_camera_jpeg_key";
     public static final String KEY_VIDEOCAMERA_JPEG = "pref_camera_video_jpeg_key";
     public static final String KEY_COLOR_EFFECT = "pref_camera_coloreffect_key";
     public static final String KEY_VIDEOCAMERA_COLOR_EFFECT = "pref_camera_video_coloreffect_key";
     public static final String KEY_BURST_MODE = "pref_camera_burst_key";
+    public static final String KEY_STORAGE = "pref_camera_storage_key";
 
     public static final String EXPOSURE_DEFAULT_VALUE = "0";
     public static final String VALUE_ON = "on";
@@ -172,7 +172,6 @@ public class CameraSettings {
         ListPreference sceneMode = group.findPreference(KEY_SCENE_MODE);
         ListPreference flashMode = group.findPreference(KEY_FLASH_MODE);
         ListPreference focusMode = group.findPreference(KEY_FOCUS_MODE);
-        ListPreference storageMode = group.findPreference(KEY_STORAGE);
         IconListPreference exposure =
                 (IconListPreference) group.findPreference(KEY_EXPOSURE);
         IconListPreference cameraIdPref =
@@ -182,15 +181,12 @@ public class CameraSettings {
         ListPreference videoEffect = group.findPreference(KEY_VIDEO_EFFECT);
         ListPreference cameraHdr = group.findPreference(KEY_CAMERA_HDR);
         ListPreference isoMode = group.findPreference(KEY_ISO_MODE);
-        ListPreference jpegQuality = group.findPreference(KEY_JPEG);
         ListPreference colorEffect = group.findPreference(KEY_COLOR_EFFECT);
+        ListPreference videoColorEffect = group.findPreference(KEY_VIDEOCAMERA_COLOR_EFFECT);
+        ListPreference storage = group.findPreference(KEY_STORAGE);
 
         // Since the screen could be loaded from different resources, we need
         // to check if the preference is available here
-        if (ActivityBase.mNoExt) {
-            removePreference(group, storageMode.getKey());
-        }
-
         if (videoQuality != null) {
             filterUnsupportedOptions(group, videoQuality, getSupportedVideoQuality());
         }
@@ -213,10 +209,9 @@ public class CameraSettings {
                     flashMode, mParameters.getSupportedFlashModes());
         }
         if (focusMode != null) {
-            if (!Util.isFocusAreaSupported(mParameters)) {
-                filterUnsupportedOptions(group,
-                        focusMode, mParameters.getSupportedFocusModes());
-            } else if (!mContext.getResources().getBoolean(R.bool.wantsFocusModes)) {
+            filterUnsupportedOptions(group,
+                    focusMode, mParameters.getSupportedFocusModes());
+            if (!mContext.getResources().getBoolean(R.bool.wantsFocusModes)) {
                 // Remove the focus mode if we can use tap-to-focus.
                 removePreference(group, focusMode.getKey());
             }
@@ -255,6 +250,15 @@ public class CameraSettings {
         if (colorEffect != null) {
             filterUnsupportedOptions(group,
                     colorEffect, mParameters.getSupportedColorEffects());
+        }
+        if (videoColorEffect != null) {
+            filterUnsupportedOptions(group,
+                    videoColorEffect, mParameters.getSupportedColorEffects());
+        }
+        if (storage != null) {
+            if (storage.getEntries().length < 2) {
+                removePreference(group, storage.getKey());
+            }
         }
     }
 

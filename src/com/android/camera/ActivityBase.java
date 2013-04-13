@@ -46,8 +46,6 @@ import com.android.gallery3d.common.ApiHelper;
 import com.android.gallery3d.ui.ScreenNail;
 import com.android.gallery3d.util.MediaSetUtils;
 
-import java.io.File;
-
 /**
  * Superclass of camera activity.
  */
@@ -82,11 +80,6 @@ public abstract class ActivityBase extends AbstractGalleryActivity
 
     // Keep track of powershutter state
     public static boolean mPowerShutter = false;
-
-    // Keep track of External Storage
-    public static boolean mStorageExternal;
-    public static boolean mNoExt = false;
-    public static boolean mStorageToggled = false;
 
     // multiple cameras support
     protected int mNumberOfCameras;
@@ -232,22 +225,6 @@ public abstract class ActivityBase extends AbstractGalleryActivity
         }
     }
 
-    // Initialize storage preferences
-    protected void initStoragePrefs(ComboPreferences prefs) {
-        prefs.setLocalId(getApplicationContext(), 0);
-        String val = prefs.getString(CameraSettings.KEY_STORAGE,
-                getResources().getString(R.string.pref_camera_storage_title_default));
-        mStorageToggled = ( mStorageExternal == val.equals(CameraSettings.VALUE_ON)) ? false : true;
-        mStorageExternal = val.equals(CameraSettings.VALUE_ON);
-        File extDCIM = new File(Storage.EXTMMC);
-        // Condition for External SD absence
-        if(extDCIM.exists()) mNoExt = false;
-        else {
-            mNoExt=true;
-            mStorageExternal = false;
-        }
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -344,7 +321,7 @@ public abstract class ActivityBase extends AbstractGalleryActivity
     }
 
     protected void updateStorageSpace() {
-        mStorageSpace = Storage.getAvailableSpace();
+        mStorageSpace = Storage.getStorage().getAvailableSpace();
     }
 
     protected long getStorageSpace() {
@@ -403,7 +380,7 @@ public abstract class ActivityBase extends AbstractGalleryActivity
             if (mSecureCamera) {
                 path = "/secure/all/" + sSecureAlbumId;
             } else {
-                path = "/local/all/" + Storage.generateBucketIdInt();
+                path = "/local/all/" + Storage.getStorage().generateBucketIdInt();
             }
         } else {
             path = "/local/all/0"; // Use 0 so gallery does not show anything.
@@ -437,7 +414,7 @@ public abstract class ActivityBase extends AbstractGalleryActivity
             if (mSecureCamera) {
                 path = "/secure/all/" + sSecureAlbumId;
             } else {
-                path = "/local/all/" + Storage.generateBucketIdInt();
+                path = "/local/all/" + Storage.getStorage().generateBucketIdInt();
             }
         } else {
             path = "/local/all/0"; // Use 0 so gallery does not show anything.
@@ -453,6 +430,8 @@ public abstract class ActivityBase extends AbstractGalleryActivity
         data.putParcelable(PhotoPage.KEY_APP_BRIDGE, mAppBridge);
         if (getStateManager().getStateCount() == 0) {
             getStateManager().startState(PhotoPage.class, data);
+        } else {
+            getStateManager().startStateNow(PhotoPage.class, data);
         }
         mCameraScreenNail = mAppBridge.getCameraScreenNail();
         return mCameraScreenNail;
