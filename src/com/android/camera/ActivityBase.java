@@ -431,7 +431,7 @@ public abstract class ActivityBase extends AbstractGalleryActivity
         if (getStateManager().getStateCount() == 0) {
             getStateManager().startState(PhotoPage.class, data);
         } else {
-            getStateManager().startStateNow(PhotoPage.class, data);
+            getStateManager().switchState(getStateManager().getTopState(),PhotoPage.class, data);
         }
         mCameraScreenNail = mAppBridge.getCameraScreenNail();
         return mCameraScreenNail;
