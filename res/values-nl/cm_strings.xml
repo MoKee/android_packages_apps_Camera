@@ -19,10 +19,14 @@
     <string name="pref_camera_picturesize_entry_12_8mp">12,8 megapixel</string>
     <string name="pref_camera_picturesize_entry_11_5mp">11,5 megapixel</string>
     <string name="pref_camera_picturesize_entry_9mp">9 megapixel</string>
+    <string name="pref_camera_picturesize_entry_7mp">7 megapixel</string>
     <string name="pref_camera_picturesize_entry_6_4mp">6,4 megapixel</string>
+    <string name="pref_camera_picturesize_entry_6mp">6 megapixel</string>
     <string name="pref_camera_picturesize_entry_4mp">4 megapixel</string>
     <string name="pref_camera_picturesize_entry_2_5mp">2,5 megapixel</string>
+    <string name="pref_camera_picturesize_entry_2_4mp">2,4 megapixel</string>
     <string name="pref_camera_picturesize_entry_2_1mp">2,1 megapixel</string>
+    <string name="pref_camera_picturesize_entry_1_9mp">1,9 megapixel</string>
     <string name="pref_camera_picturesize_entry_1_5mp">1,5 megapixel</string>
     <string name="pref_camera_picturesize_entry_xga">XGA</string>
     <string name="pref_camera_picturesize_entry_svga">SVGA</string>
@@ -105,6 +109,7 @@
     <string name="pref_camera_focustime_entry_30">30 sec.</string>
     <string name="pref_camera_focustime_entry_infinite">Oneindig</string>
     <string name="pref_camera_nohands_title">Handsfree-foto</string>
+    <string name="pref_camera_nohands_voice_entry">Stem</string>
     <string name="pref_camera_timer_entry_0">Uit</string>
     <string name="pref_camera_timer_entry_10">10 sec.</string>
     <string name="pref_camera_timer_entry_20">20 sec.</string>
