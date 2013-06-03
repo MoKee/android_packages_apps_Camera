@@ -37,6 +37,13 @@ import java.io.FileOutputStream;
 public class Storage {
     private static final String TAG = "CameraStorage";
 
+    public static final String DCIM =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString();
+
+    // External SD DCIM (/storage/sdcard1 is android default external sd location)
+    public static final String EXTDCIM = "/storage/sdcard1/DCIM";
+    public static final String EXTMMC = "/storage/sdcard1";
+
     public static final long UNAVAILABLE = -1L;
     public static final long PREPARING = -2L;
     public static final long UNKNOWN_SIZE = -3L;
@@ -217,7 +224,7 @@ public class Storage {
         return true;
     }
 
-    public void deleteImage(ContentResolver resolver, Uri uri) {
+    public static void deleteImage(ContentResolver resolver, Uri uri) {
         try {
             resolver.delete(uri, null, null);
         } catch (Throwable th) {
@@ -225,24 +232,27 @@ public class Storage {
         }
     }
 
-    private String generateDCIM() {
-        return new File(mRoot, Environment.DIRECTORY_DCIM).toString();
+   public static String generateDCIM() {
+        // External DCIM check
+        if(!ActivityBase.mStorageExternal) {
+            return DCIM.toString();
+        } else {
+            return EXTDCIM.toString();
+        }
     }
 
-    public String generateDirectory() {
+    public static String generateDir() {
+        // External DCIM check
         return generateDCIM() + "/Camera";
     }
 
-    private String generateFilepath(String title) {
-        return generateDirectory() + '/' + title + ".jpg";
+    public static String generateFilepath(String title) {
+        // External DCIM check
+        return generateDir() + '/' + title + ".jpg";
     }
 
-    public String generateBucketId() {
-        return String.valueOf(generateDirectory().toLowerCase().hashCode());
-    }
-
-    public int generateBucketIdInt() {
-        return generateDirectory().toLowerCase().hashCode();
+    public static int generateBucketIdInt() {
+        return generateDir().toLowerCase().hashCode();
     }
 
     public long getAvailableSpace() {
@@ -255,14 +265,14 @@ public class Storage {
             return UNAVAILABLE;
         }
 
-        File dir = new File(generateDirectory());
+        File dir = new File(generateDir());
         dir.mkdirs();
         if (!dir.isDirectory() || !dir.canWrite()) {
             return UNAVAILABLE;
         }
 
         try {
-            StatFs stat = new StatFs(generateDirectory());
+            StatFs stat = new StatFs(generateDir());
             return stat.getAvailableBlocks() * (long) stat.getBlockSize();
         } catch (Exception e) {
             Log.i(TAG, "Fail to access external storage", e);
