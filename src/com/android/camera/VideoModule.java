@@ -1951,7 +1951,6 @@ public class VideoModule implements CameraModule,
 
     private void updateCustomSettings() {
         mActivity.initPowerShutter(mPreferences);
-        mActivity.initStoragePrefs(mPreferences);
         mActivity.initSmartCapture(mPreferences);
         if (mActivity.mSmartCapture) {
             startSmartCapture();
@@ -2215,7 +2214,7 @@ public class VideoModule implements CameraModule,
         // else it will crash the thread on low end devices
         if (((SystemClock.uptimeMillis() - mLastVid) > 2000) && mActivity.mShowCameraAppView) {
             int currentProx = (int) event.values[0];
-            if (currentProx == 0) {
+            if (currentProx <= 3) {
                 onShutterButtonClick();
                 mLastVid = SystemClock.uptimeMillis();
             }

@@ -962,7 +962,6 @@ public class PhotoModule
 
     private void updateCustomSettings() {
         mActivity.initPowerShutter(mPreferences);
-        mActivity.initStoragePrefs(mPreferences);
         mActivity.initSmartCapture(mPreferences);
         if (mActivity.mSmartCapture) {
             startSmartCapture();
@@ -2367,7 +2366,7 @@ public class PhotoModule
     public void onSensorChanged(SensorEvent event) {
         if (mActivity.mShowCameraAppView) {
             int currentProx = (int) event.values[0];
-            if (currentProx == 0) {
+            if (currentProx <= 3) {
                 if (mFirstTimeInitialized) {
                     onShutterButtonFocus(true);
                 }
