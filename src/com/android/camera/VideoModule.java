@@ -978,7 +978,6 @@ public class VideoModule implements CameraModule,
     // By default, we want to close the effects as well with the camera.
     private void closeCamera() {
         closeCamera(true);
-        stopSmartCapture();
     }
 
     // In certain cases, when the effects are active, we may want to shutdown
@@ -2877,6 +2876,7 @@ public class VideoModule implements CameraModule,
         public synchronized void finish() {
             mStop = true;
             notifyAll();
+            stopSmartCapture();
         }
 
         // Runs in namer thread
