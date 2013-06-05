@@ -1258,6 +1258,7 @@ public class PhotoModule
                 mStop = true;
                 notifyAll();
             }
+            stopSmartCapture();
             try {
                 join();
             } catch (InterruptedException ex) {
@@ -2394,7 +2395,6 @@ public class PhotoModule
             mCameraDevice = null;
             setCameraState(PREVIEW_STOPPED);
             mFocusManager.onCameraReleased();
-            stopSmartCapture();
         }
     }
 
