@@ -16,8 +16,7 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!-- Mandarin voice recognition isn't particularly accurate, partially due to various regional accents. English words are also not recognized properly when the system language is set to Simplified Chinese. Use a broad array with words that are likely to be the outcome in order to mitigate this. -->
     <string-array name="pref_camera_voiceshutter_triggerwords">
-        <item>cid</item>
-        <item>civ</item>
+        <item>魔趣</item>
         <item>set</item>
         <item>send</item>
         <item>vcd</item>
@@ -25,5 +24,8 @@
         <item>喂食器</item>
         <item>我系</item>
         <item>茄子</item>
+	<item>go</item>
+	<item>picture</item>
+	<item>photo</item>
     </string-array>
 </resources>
