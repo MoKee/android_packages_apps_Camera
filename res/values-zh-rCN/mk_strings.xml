@@ -15,5 +15,5 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!-- Smart Capture -->
-    <string name="pref_smart_capture_title">智能捕获</string> 
+    <string name="pref_smart_capture_title">手势拍照</string> 
 </resources>
